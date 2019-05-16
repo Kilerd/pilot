@@ -1,9 +1,5 @@
+#![feature(async_await, await_macro)]
+pub mod bot;
+pub mod error;
+pub mod methods;
 pub mod typing;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}

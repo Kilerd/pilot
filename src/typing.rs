@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use serde::Serialize;
+use serde_with::skip_serializing_none;
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     /// Unique identifier for this user or bot
