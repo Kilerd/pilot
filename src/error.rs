@@ -5,7 +5,7 @@ pub struct ApiResult<T> {
     pub ok: bool,
     pub error_code: Option<i32>,
     pub description: Option<String>,
-    pub result: T,
+    pub result: Option<T>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -19,7 +19,7 @@ pub type BotResult<T> = Result<T, ApiError>;
 impl<T> ApiResult<T> {
     fn as_result(self) -> BotResult<T> {
         if self.ok {
-            Ok(self.result)
+            Ok(self.result.unwrap())
         } else {
             Err(ApiError {
                 error_code: self.error_code.expect("undetected condition"),
