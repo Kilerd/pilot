@@ -17,7 +17,7 @@ pub enum ReplyMarkup {
     InlineKeyboardMarkup(Vec<Vec<InlineKeyboardButton>>),
     ReplyKeyboardMarkup(ReplyKeyboardMarkup),
     ReplyKeyboardRemove(ReplyKeyboardRemove),
-    ForceReply(ForceReply)
+    ForceReply(ForceReply),
 }
 
 #[skip_serializing_none]
@@ -25,11 +25,11 @@ pub enum ReplyMarkup {
 pub struct SendMessage{
     pub chat_id: String,
     pub text: String,
-    pub parse_mod : Option<String>,
+    pub parse_mod: Option<String>,
     pub disable_web_page_preview: Option<bool>,
     pub disable_notification: Option<bool>,
     pub reply_to_message_id: Option<i32>,
-    pub reply_markup: Option<ReplyMarkup>
+    pub reply_markup: Option<ReplyMarkup>,
 }
 
 impl SendMessage {
@@ -41,7 +41,7 @@ impl SendMessage {
             disable_web_page_preview: None,
             disable_notification: None,
             reply_to_message_id: None,
-            reply_markup: None
+            reply_markup: None,
         }
     }
 }
@@ -51,12 +51,17 @@ impl SendMessage {
 pub struct ForwardMessage {
     pub chat_id: String,
     pub from_chat_id: String,
-    pub disable_notification : Option<bool>,
-    pub message_id:i32
+    pub disable_notification: Option<bool>,
+    pub message_id: i32,
 }
 
 
-impl_method!(GetMe -> User);
+impl GetMe {
+    fn request(self, bot: &Bot, ) -> impl Future3<Output=Result<ApiResult<User>, ()>> {
+        bot.request("getMe", self)
+    }
+}
+
 impl_method!(SendMessage -> Message);
 impl_method!(ForwardMessage -> Message);
 
@@ -72,15 +77,13 @@ mod tests {
 
     #[test]
     fn should_get_me_work() {
-
         let x = async {
             let bot = Bot::new(std::env::var("BOT_TOKEN").expect("need to set BOT_TOKEN as environment variable"));
             let get_me = GetMe {};
             let x = get_me.request(&bot);
-            let a: Result<ApiResult<User>, ()> = x.await;
+            let a = x.await;
             println!("{:?}", a);
             assert_eq!(true, a.unwrap().ok);
-            ()
         };
         tokio::run(x.unit_error().boxed().compat());
     }
@@ -91,7 +94,7 @@ mod tests {
             let bot = Bot::new(std::env::var("BOT_TOKEN").expect("need to set BOT_TOKEN as environment variable"));
             let send_message = SendMessage::new(std::env::var("SEND_MESSAGE_CHAT_ID").expect("need SEND_MESSAGE_CHAT_ID"), "hello test");
             let x = send_message.request(&bot);
-            let a= x.await;
+            let a = x.await;
             dbg!(&a);
             assert_eq!(true, a.unwrap().ok);
             ()
