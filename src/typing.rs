@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct User {
     /// Unique identifier for this user or bot
     pub id: i32,
@@ -18,7 +18,7 @@ pub struct User {
     pub language_code: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum ChatType {
     Private,
@@ -27,7 +27,7 @@ pub enum ChatType {
     Channel,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Chat {
     /// Unique identifier for this chat.
     pub id: i64,
@@ -58,7 +58,7 @@ pub struct Chat {
     pub can_set_sticker_set: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Message {
     pub message_id: i32,
     pub from: Option<User>,
@@ -108,7 +108,7 @@ pub struct Message {
     pub passport_data: Option<PassportData>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MessageEntity {
     #[serde(rename = "type")]
     pub message_type: String,
@@ -118,7 +118,7 @@ pub struct MessageEntity {
     pub user: Option<User>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PhotoSize {
     pub file_id: String,
     pub width: i32,
@@ -126,7 +126,7 @@ pub struct PhotoSize {
     pub file_size: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Audio {
     pub file_id: String,
     pub duration: i32,
@@ -137,7 +137,7 @@ pub struct Audio {
     pub thumb: Option<PhotoSize>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Document {
     pub file_id: String,
     pub thumb: Option<PhotoSize>,
@@ -146,7 +146,7 @@ pub struct Document {
     pub file_size: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Video {
     pub file_id: String,
     pub width: i32,
@@ -157,7 +157,7 @@ pub struct Video {
     pub file_size: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Animation {
     pub file_id: String,
     pub width: i32,
@@ -169,7 +169,7 @@ pub struct Animation {
     pub file_size: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Voice {
     file_id: String,
     duration: i32,
@@ -177,7 +177,7 @@ pub struct Voice {
     file_size: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct VideoNote {
     file_id: String,
     length: i32,
@@ -186,7 +186,7 @@ pub struct VideoNote {
     file_size: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Contact {
     phone_number: String,
     first_name: String,
@@ -195,13 +195,13 @@ pub struct Contact {
     vcard: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Location {
     longitude: f64,
     latitude: f64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Venue {
     location: Location,
     title: String,
@@ -210,13 +210,13 @@ pub struct Venue {
     foursquare_type: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PollOption {
     text: String,
     voter_count: i32,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Poll {
     id: String,
     question: String,
@@ -224,20 +224,20 @@ pub struct Poll {
     is_closed: bool,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserProfilePhotos {
     total_count: i32,
     photo: Vec<Vec<PhotoSize>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct File {
     file_id: String,
     file_size: Option<i32>,
     file_path: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ReplyKeyboardMarkup {
     keyboard: Vec<Vec<KeyboardButton>>,
     resize_keyboard: Option<bool>,
@@ -245,26 +245,26 @@ pub struct ReplyKeyboardMarkup {
     selective: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct KeyboardButton {
     text: String,
     request_contact: Option<bool>,
     request_location: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ReplyKeyboardRemove {
     /// should be true
     remove_keyboard: bool,
     selective: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InlineKeyboardMarkup {
     inline_keyboard: Vec<Vec<InlineKeyboardButton>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InlineKeyboardButton {
     text: String,
     url: Option<String>,
@@ -275,7 +275,7 @@ pub struct InlineKeyboardButton {
     pay: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CallbackQuery {
     id: String,
     from: User,
@@ -286,19 +286,19 @@ pub struct CallbackQuery {
     game_short_name: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ForceReply {
     /// should be true
     force_reply: bool,
     selective: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ChatPhoto {
     small_file_id: String,
     big_file_id: String,
 }
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ChatMemberStatus {
     Creator,
     Administrator,
@@ -308,7 +308,7 @@ pub enum ChatMemberStatus {
     Kicked,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ChatMember {
     user: User,
     status: ChatMemberStatus,
@@ -329,13 +329,13 @@ pub struct ChatMember {
     can_add_web_page_previews: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ResponseParameters {
     migrate_to_chat_id: Option<i32>,
     retry_after: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum InputMedia {
     Animation(InputMediaAnimation),
     Document(InputMediaDocument),
@@ -344,13 +344,13 @@ pub enum InputMedia {
     Video(InputMediaVideo),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ParseMode {
     Markdown,
     Html,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InputMediaPhoto {
     /// always be photo
     #[serde(rename = "type")]
@@ -360,7 +360,7 @@ pub struct InputMediaPhoto {
     parse_mode: Option<ParseMode>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InputMediaVideo {
     #[serde(rename = "type")]
     video_type: String,
@@ -375,7 +375,7 @@ pub struct InputMediaVideo {
     supports_streaming: Option<bool>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InputMediaAudio {
     #[serde(rename = "type")]
     audio_type: String,
@@ -388,7 +388,7 @@ pub struct InputMediaAudio {
     title: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InputMediaAnimation {
     #[serde(rename = "type")]
     animation_type: String,
@@ -401,7 +401,7 @@ pub struct InputMediaAnimation {
     duration: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InputMediaDocument {
     #[serde(rename = "type")]
     document_type: String,
@@ -411,7 +411,7 @@ pub struct InputMediaDocument {
     parse_mode: Option<ParseMode>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Sticker {
     file_id: String,
     width: i32,
@@ -423,7 +423,7 @@ pub struct Sticker {
     fil_size: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Game {
     title: String,
     description: String,
@@ -433,10 +433,10 @@ pub struct Game {
     animation: Option<Animation>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CallbackGame;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Invoice {
     title: String,
     description: String,
@@ -445,7 +445,7 @@ pub struct Invoice {
     total_amount: i32,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SuccessfulPayment {
     currency: String,
     total_amount: i32,
@@ -456,7 +456,7 @@ pub struct SuccessfulPayment {
     provider_payment_charge_id: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OrderInfo {
     name: Option<String>,
     phone_number: Option<String>,
@@ -464,7 +464,7 @@ pub struct OrderInfo {
     shipping_address: Option<ShippingAddress>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ShippingAddress {
     country_code: String,
     state: String,
@@ -474,5 +474,5 @@ pub struct ShippingAddress {
     post_code: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PassportData;

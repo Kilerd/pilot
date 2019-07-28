@@ -9,10 +9,10 @@ use crate::typing::{InlineKeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemo
 
 use serde_with::skip_serializing_none;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GetMe {}
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ReplyMarkup {
     InlineKeyboardMarkup(Vec<Vec<InlineKeyboardButton>>),
     ReplyKeyboardMarkup(ReplyKeyboardMarkup),
@@ -21,7 +21,7 @@ pub enum ReplyMarkup {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SendMessage{
     pub chat_id: String,
     pub text: String,
@@ -47,7 +47,7 @@ impl SendMessage {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ForwardMessage {
     pub chat_id: String,
     pub from_chat_id: String,
