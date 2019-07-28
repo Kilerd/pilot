@@ -61,7 +61,7 @@ pub struct Chat {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Message {
     pub message_id: i32,
-    pub form: Option<User>,
+    pub from: Option<User>,
     pub date: i32,
     pub chat: Box<Chat>,
     pub forward_from: Option<User>,
