@@ -3,18 +3,18 @@ use futures::Future as Future3;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::fmt::Debug;
 
-macro_rules! impl_method {
-    ($name:ident -> $return_type:ty) => {
-        impl $name {
-            fn request(
-                self,
-                bot: &Bot,
-            ) -> impl Future3<Output = Result<ApiResult<$return_type>, ()>> {
-                bot.request(stringify!($name), self)
-            }
-        }
-    };
-}
+//macro_rules! impl_method {
+//    ($name:ident -> $return_type:ty) => {
+//        impl $name {
+//            fn request(
+//                self,
+//                bot: &Bot,
+//            ) -> impl Future3<Output = Result<ApiResult<$return_type>, ()>> {
+//                bot.request(stringify!($name), self)
+//            }
+//        }
+//    };
+//}
 
 pub mod basic;
 pub mod update;

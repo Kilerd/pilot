@@ -6,10 +6,10 @@ use crate::{
 use futures::Future as Future3;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
-
-impl_method!(GetUpdates -> Vec<Update>);
-impl_method!(SetWebhook -> ());
-impl_method!(GetWebhookInfo -> WebhookInfo);
+//
+//impl_method!(GetUpdates -> Vec<Update>);
+//impl_method!(SetWebhook -> ());
+//impl_method!(GetWebhookInfo -> WebhookInfo);
 
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
