@@ -3,7 +3,6 @@ use crate::{
     error::ApiResult,
     typing::{CallbackQuery, Location, Message, OrderInfo, Poll, ShippingAddress, User},
 };
-use futures::Future as Future3;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 //

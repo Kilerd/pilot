@@ -4,8 +4,6 @@ use crate::{
     error::ApiResult,
     typing::{Message, User},
 };
-use actix_web::client::Client;
-use futures01::Future as Future1;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::env;
@@ -24,7 +22,7 @@ pub enum ReplyMarkup {
 
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct SendMessage{
+pub struct SendMessage {
     pub chat_id: String,
     pub text: String,
     pub parse_mod: Option<String>,

@@ -1,5 +1,4 @@
 use crate::{bot::Bot, error::ApiResult};
-use futures::Future as Future3;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::fmt::Debug;
 
