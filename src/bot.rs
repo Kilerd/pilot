@@ -13,9 +13,26 @@
 //use futures01::Future as Future1;
 //use std::fmt::Debug;
 //
+use crate::methods::basic::SendMessage;
+use actix::prelude::*;
+
 pub struct Bot {
-    token: String,
+    pub secret_key: String,
 }
+
+impl Bot {
+    pub fn new() -> Self {
+        Bot {
+            secret_key: std::env::var("TELEGRAM_BOT_SECRET_KEY")
+                .expect("need to set TELEGRAM_BOT_SECRET_KEY as environment variable"),
+        }
+    }
+}
+
+impl Actor for Bot {
+    type Context = SyncContext<Self>;
+}
+
 //
 //impl Bot {
 //    pub fn new(token: impl Into<String>) -> Self {

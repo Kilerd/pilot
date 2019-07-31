@@ -1,13 +1,14 @@
-use crate::typing::{ForceReply, InlineKeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove};
 use crate::{
     bot::Bot,
     error::ApiResult,
-    typing::{Message, User},
+    typing::{
+        ForceReply, InlineKeyboardButton, Message, ReplyKeyboardMarkup, ReplyKeyboardRemove, User,
+    },
 };
+use actix::Handler;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
-use std::env;
-use std::future::Future as Future3;
+use std::{env, future::Future as Future3};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GetMe {}
@@ -53,6 +54,34 @@ pub struct ForwardMessage {
     pub from_chat_id: String,
     pub disable_notification: Option<bool>,
     pub message_id: i32,
+}
+
+impl actix::Message for SendMessage {
+    type Result = ();
+}
+
+impl Handler<SendMessage> for Bot {
+    type Result = ();
+
+    fn handle(&mut self, msg: SendMessage, ctx: &mut Self::Context) -> Self::Result {
+        println!("doing sendmessage");
+        reqwest::Client::new()
+            .post(
+                format!(
+                    "https://api.telegram.org/bot{}/sendMessage",
+                    self.secret_key
+                )
+                .as_str(),
+            )
+            .json(&msg)
+            .send()
+            .map_err(|e| {
+                dbg!(&e);
+                e
+            });
+
+        ()
+    }
 }
 
 //impl GetMe {
