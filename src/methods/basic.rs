@@ -56,8 +56,35 @@ pub struct ForwardMessage {
     pub message_id: i32,
 }
 
+impl actix::Message for GetMe {
+    type Result = ();
+}
+
 impl actix::Message for SendMessage {
     type Result = ();
+}
+
+impl Handler<GetMe> for Bot {
+    type Result = ();
+
+    fn handle(&mut self, msg: GetMe, ctx: &mut Self::Context) -> Self::Result {
+        reqwest::Client::new()
+            .post(
+                format!(
+                    "https://api.telegram.org/bot{}/GetMe",
+                    self.secret_key
+                )
+                    .as_str(),
+            )
+            .json(&msg)
+            .send()
+            .map_err(|e| {
+                dbg!(&e);
+                e
+            });
+
+        ()
+    }
 }
 
 impl Handler<SendMessage> for Bot {
