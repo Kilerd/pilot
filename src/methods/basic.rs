@@ -38,7 +38,7 @@ impl SendMessage {
         Self {
             chat_id: chat_id.into(),
             text: text.into(),
-            parse_mod: None,
+            parse_mode: None,
             disable_web_page_preview: None,
             disable_notification: None,
             reply_to_message_id: None,
@@ -69,13 +69,7 @@ impl Handler<GetMe> for Bot {
 
     fn handle(&mut self, msg: GetMe, ctx: &mut Self::Context) -> Self::Result {
         reqwest::Client::new()
-            .post(
-                format!(
-                    "https://api.telegram.org/bot{}/GetMe",
-                    self.secret_key
-                )
-                    .as_str(),
-            )
+            .post(format!("https://api.telegram.org/bot{}/GetMe", self.secret_key).as_str())
             .json(&msg)
             .send()
             .map_err(|e| {
