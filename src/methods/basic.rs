@@ -26,7 +26,7 @@ pub enum ReplyMarkup {
 pub struct SendMessage {
     pub chat_id: String,
     pub text: String,
-    pub parse_mod: Option<String>,
+    pub parse_mode: Option<String>,
     pub disable_web_page_preview: Option<bool>,
     pub disable_notification: Option<bool>,
     pub reply_to_message_id: Option<i32>,
