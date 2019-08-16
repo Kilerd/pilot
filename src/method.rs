@@ -1,94 +1,117 @@
+use crate::typing::{
+    ForceReply, InlineKeyboardButton, ParseMode, ReplyKeyboardMarkup, ReplyKeyboardRemove,
+};
 use crate::{
     bot::Bot,
     error::ApiResult,
     typing::{CallbackQuery, Location, Message, OrderInfo, Poll, ShippingAddress, User},
 };
+use actix::Handler;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
-//
-//impl_method!(GetUpdates -> Vec<Update>);
-//impl_method!(SetWebhook -> ());
-//impl_method!(GetWebhookInfo -> WebhookInfo);
+use std::borrow::Cow;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GetMe {}
 
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ChosenInlineResult {
-    pub result_id: String,
-    pub from: User,
-    pub location: Option<Location>,
-    pub inline_message_id: Option<String>,
-    pub query: String,
+pub struct SendMessage<'a> {
+    pub chat_id: Cow<'a, str>,
+    pub text: Cow<'a, str>,
+    pub parse_mode: Option<ParseMode>,
+    pub disable_web_page_preview: Option<bool>,
+    pub disable_notification: Option<bool>,
+    pub reply_to_message_id: Option<i32>,
+    pub reply_markup: Option<ReplyMarkup>,
+}
+
+impl<'a> SendMessage<'a> {
+    pub fn new(chat_id: impl Into<Cow<'a, str>>, text: impl Into<Cow<'a, str>>) -> SendMessage<'a> {
+        SendMessage {
+            chat_id: chat_id.into(),
+            text: text.into(),
+            parse_mode: None,
+            disable_web_page_preview: None,
+            disable_notification: None,
+            reply_to_message_id: None,
+            reply_markup: None,
+        }
+    }
+    pub fn parse_mode(self, mode: ParseMode) -> SendMessage<'a> {
+        Self {
+            parse_mode: Some(mode),
+            ..self
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ReplyMarkup {
+    InlineKeyboardMarkup(Vec<Vec<InlineKeyboardButton>>),
+    ReplyKeyboardMarkup(ReplyKeyboardMarkup),
+    ReplyKeyboardRemove(ReplyKeyboardRemove),
+    ForceReply(ForceReply),
 }
 
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ShippingQuery {
-    pub id: String,
-    pub from: User,
-    pub invoice_payload: String,
-    pub shipping_address: ShippingAddress,
+pub struct ForwardMessage {
+    pub chat_id: String,
+    pub from_chat_id: String,
+    pub disable_notification: Option<bool>,
+    pub message_id: i32,
 }
 
-#[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct PreCheckoutQuery {
-    pub id: String,
-    pub from: User,
-    pub currency: String,
-    pub total_amount: i32,
-    pub invoice_payload: String,
-    pub shipping_option_id: Option<String>,
-    pub order_info: Option<OrderInfo>,
+impl actix::Message for GetMe {
+    type Result = ();
 }
 
-/// This object represents an incoming update.
-/// At most one of the optional parameters can be present in any given update.
-#[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Update {
-    /// The update‘s unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using Webhooks, since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order. If there are no new updates for at least a week, then identifier of the next update will be chosen randomly instead of sequentially.
-    pub update_id: i32,
-    /// New incoming message of any kind — text, photo, sticker, etc.
-    pub message: Option<Message>,
-    /// New version of a message that is known to the bot and was edited
-    pub edited_message: Option<Message>,
-    /// New incoming channel post of any kind — text, photo, sticker, etc.
-    pub channel_post: Option<Message>,
-    /// New version of a channel post that is known to the bot and was edited
-    pub edited_channel_post: Option<Message>,
-    /// New incoming inline query
-    pub inline_query: Option<Message>,
-    /// The result of an inline query that was chosen by a user and sent to their chat partner. Please see our documentation on the feedback collecting for details on how to enable these updates for your bot.
-    pub chosen_inline_result: Option<ChosenInlineResult>,
-    /// New incoming callback query
-    pub callback_query: Option<CallbackQuery>,
-    /// New incoming shipping query. Only for invoices with flexible price
-    pub shipping_query: Option<ShippingQuery>,
-    /// New incoming pre-checkout query. Contains full information about checkout
-    pub pre_checkout_query: Option<PreCheckoutQuery>,
-    /// New poll state. Bots receive only updates about polls, which are sent or stopped by the bot
-    pub poll: Option<Poll>,
+impl<'a> actix::Message for SendMessage<'a> {
+    type Result = ();
 }
 
-/// Contains information about the current status of a webhook.
-#[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct WebhookInfo {
-    /// Webhook URL, may be empty if webhook is not set up
-    pub url: String,
-    /// True, if a custom certificate was provided for webhook certificate checks
-    pub has_custom_certificate: bool,
-    /// Number of updates awaiting delivery
-    pub pending_update_count: i32,
-    /// Unix time for the most recent error that happened when trying to deliver an update via webhook
-    pub last_error_date: Option<i32>,
-    /// Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook
-    pub last_error_message: Option<String>,
-    /// Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery
-    pub max_connections: Option<i32>,
-    /// A list of update types the bot is subscribed to. Defaults to all update types
-    pub allowed_updates: Option<Vec<String>>,
+impl Handler<GetMe> for Bot {
+    type Result = ();
+
+    fn handle(&mut self, msg: GetMe, ctx: &mut Self::Context) -> Self::Result {
+        reqwest::Client::new()
+            .post(format!("https://api.telegram.org/bot{}/GetMe", self.secret_key).as_str())
+            .json(&msg)
+            .send()
+            .map_err(|e| {
+                dbg!(&e);
+                e
+            });
+
+        ()
+    }
 }
+
+impl<'a> Handler<SendMessage<'a>> for Bot {
+    type Result = ();
+
+    fn handle(&mut self, msg: SendMessage, ctx: &mut Self::Context) -> Self::Result {
+        println!("doing sendmessage");
+        reqwest::Client::new()
+            .post(
+                format!(
+                    "https://api.telegram.org/bot{}/sendMessage",
+                    self.secret_key
+                )
+                .as_str(),
+            )
+            .json(&msg)
+            .send()
+            .map_err(|e| {
+                dbg!(&e);
+                e
+            });
+
+        ()
+    }
+}
+
 /// The method for receiving incoming updates using long polling
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]

@@ -13,7 +13,7 @@
 //use futures01::Future as Future1;
 //use std::fmt::Debug;
 //
-use crate::methods::basic::SendMessage;
+use crate::method::SendMessage;
 use actix::prelude::*;
 
 pub struct Bot {

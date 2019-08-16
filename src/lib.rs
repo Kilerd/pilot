@@ -1,4 +1,4 @@
 pub mod bot;
 pub mod error;
-pub mod methods;
+pub mod method;
 pub mod typing;

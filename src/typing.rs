@@ -18,6 +18,64 @@ pub struct User {
     pub language_code: Option<String>,
 }
 
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct WebhookInfo {
+    /// Webhook URL, may be empty if webhook is not set up
+    pub url: String,
+    /// True, if a custom certificate was provided for webhook certificate checks
+    pub has_custom_certificate: bool,
+    /// Number of updates awaiting delivery
+    pub pending_update_count: i32,
+    /// Unix time for the most recent error that happened when trying to deliver an update via webhook
+    pub last_error_date: Option<i32>,
+    /// Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook
+    pub last_error_message: Option<String>,
+    /// Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery
+    pub max_connections: Option<i32>,
+    /// A list of update types the bot is subscribed to. Defaults to all update types
+    pub allowed_updates: Option<Vec<String>>,
+}
+
+/// This object represents an incoming update.
+/// At most one of the optional parameters can be present in any given update.
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Update {
+    /// The update‘s unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using Webhooks, since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order. If there are no new updates for at least a week, then identifier of the next update will be chosen randomly instead of sequentially.
+    pub update_id: i32,
+    /// New incoming message of any kind — text, photo, sticker, etc.
+    #[serde(flatten)]
+    pub message: UpdateMessage,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum UpdateMessage {
+    /// New incoming message of any kind — text, photo, sticker, etc.
+    Message(Message),
+    /// New version of a message that is known to the bot and was edited
+    EditedMessage(Message),
+    /// New incoming channel post of any kind — text, photo, sticker, etc.
+    ChannelPost(Message),
+    /// New version of a channel post that is known to the bot and was edited
+    EditedChannelPost(Message),
+    /// New incoming inline query
+    InlineQuery(Message),
+    /// The result of an inline query that was chosen by a user and sent to their chat partner. Please see our documentation on the feedback collecting for details on how to enable these updates for your bot.
+    ChosenInlineResult(ChosenInlineResult),
+    /// New incoming callback query
+    CallbackQuery(CallbackQuery),
+    /// New incoming shipping query. Only for invoices with flexible price
+    ShippingQuery(ShippingAddress),
+    /// New incoming pre-checkout query. Contains full information about checkout
+    PreCheckoutQuery(PreCheckoutQuery),
+    /// New poll state. Bots receive only updates about polls, which are sent or stopped by the bot
+    Poll(Poll),
+    #[serde(other)]
+    Unknown,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum ChatType {
@@ -167,6 +225,37 @@ pub struct Animation {
     pub file_name: Option<String>,
     pub mime_type: Option<String>,
     pub file_size: Option<i32>,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ChosenInlineResult {
+    pub result_id: String,
+    pub from: User,
+    pub location: Option<Location>,
+    pub inline_message_id: Option<String>,
+    pub query: String,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ShippingQuery {
+    pub id: String,
+    pub from: User,
+    pub invoice_payload: String,
+    pub shipping_address: ShippingAddress,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PreCheckoutQuery {
+    pub id: String,
+    pub from: User,
+    pub currency: String,
+    pub total_amount: i32,
+    pub invoice_payload: String,
+    pub shipping_option_id: Option<String>,
+    pub order_info: Option<OrderInfo>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
