@@ -44,6 +44,24 @@ impl<'a> SendMessage<'a> {
             ..self
         }
     }
+    pub fn disable_web_page_preview(self, value: bool) -> SendMessage<'a> {
+        Self {
+            disable_web_page_preview: Some(value),
+            ..self
+        }
+    }
+    pub fn disable_notification(self, value: bool) -> SendMessage<'a> {
+        Self {
+            disable_notification: Some(value),
+            ..self
+        }
+    }
+    pub fn reply(self, to: i32) -> SendMessage<'a> {
+        Self {
+            reply_to_message_id: Some(to),
+            ..self
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
