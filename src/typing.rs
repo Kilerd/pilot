@@ -61,7 +61,7 @@ pub enum UpdateMessage {
     /// New version of a channel post that is known to the bot and was edited
     EditedChannelPost(Message),
     /// New incoming inline query
-    InlineQuery(Message),
+    InlineQuery(InlineQuery),
     /// The result of an inline query that was chosen by a user and sent to their chat partner. Please see our documentation on the feedback collecting for details on how to enable these updates for your bot.
     ChosenInlineResult(ChosenInlineResult),
     /// New incoming callback query
@@ -174,6 +174,14 @@ pub struct MessageEntity {
     pub length: i32,
     pub url: Option<String>,
     pub user: Option<User>,
+}
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct InlineQuery {
+    pub id: String,
+    pub from: User,
+    pub location: Option<Location>,
+    pub query: String,
+    pub offset: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
