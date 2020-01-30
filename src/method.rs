@@ -6,13 +6,29 @@ use crate::{
     error::ApiResult,
     typing::{CallbackQuery, Location, Message, OrderInfo, Poll, ShippingAddress, User},
 };
-use actix::Handler;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::borrow::Cow;
+use crate::TelegramApiMethod;
+
+macro_rules! impl_api_method {
+    ($($name: ty : $method_name: tt -> $ret: ty),*) => {
+     $(
+
+        impl TelegramApiMethod for $name {
+            const METHOD: &'static str = $method_name;
+            type Response = $ret;
+        }
+     )*
+    };
+}
+
+
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GetMe {}
+
+
 
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -81,54 +97,6 @@ pub struct ForwardMessage {
     pub message_id: i32,
 }
 
-impl actix::Message for GetMe {
-    type Result = ();
-}
-
-impl<'a> actix::Message for SendMessage<'a> {
-    type Result = ();
-}
-
-impl Handler<GetMe> for Bot {
-    type Result = ();
-
-    fn handle(&mut self, msg: GetMe, ctx: &mut Self::Context) -> Self::Result {
-        reqwest::Client::new()
-            .post(format!("https://api.telegram.org/bot{}/GetMe", self.secret_key).as_str())
-            .json(&msg)
-            .send()
-            .map_err(|e| {
-                dbg!(&e);
-                e
-            });
-
-        ()
-    }
-}
-
-impl<'a> Handler<SendMessage<'a>> for Bot {
-    type Result = ();
-
-    fn handle(&mut self, msg: SendMessage, ctx: &mut Self::Context) -> Self::Result {
-        println!("doing sendmessage");
-        reqwest::Client::new()
-            .post(
-                format!(
-                    "https://api.telegram.org/bot{}/sendMessage",
-                    self.secret_key
-                )
-                .as_str(),
-            )
-            .json(&msg)
-            .send()
-            .map_err(|e| {
-                dbg!(&e);
-                e
-            });
-
-        ()
-    }
-}
 
 /// The method for receiving incoming updates using long polling
 #[skip_serializing_none]
@@ -171,3 +139,11 @@ pub struct DeleteWebhook;
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GetWebhookInfo;
+
+
+
+#[rustfmt::skip]
+impl_api_method!(
+    GetMe:              "GetMe" ->          User,
+    SendMessage<'_>:    "SendMessage" ->    Message
+);
