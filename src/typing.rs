@@ -330,6 +330,7 @@ pub struct UserProfilePhotos {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct File {
     file_id: String,
+    file_unique_id: String,
     file_size: Option<i32>,
     file_path: Option<String>,
 }
@@ -573,3 +574,12 @@ pub struct ShippingAddress {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PassportData;
+
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub enum ReplyMarkup {
+    InlineKeyboardMarkup(Vec<Vec<InlineKeyboardButton>>),
+    ReplyKeyboardMarkup(ReplyKeyboardMarkup),
+    ReplyKeyboardRemove(ReplyKeyboardRemove),
+    ForceReply(ForceReply),
+}
