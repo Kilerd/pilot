@@ -364,13 +364,13 @@ pub struct InlineKeyboardMarkup {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InlineKeyboardButton {
-    text: String,
-    url: Option<String>,
-    callback_data: Option<String>,
-    switch_inline_query: Option<String>,
-    switch_inline_query_current_chat: Option<String>,
-    callback_game: Option<CallbackGame>,
-    pay: Option<bool>,
+    pub text: String,
+    pub url: Option<String>,
+    pub callback_data: Option<String>,
+    pub switch_inline_query: Option<String>,
+    pub switch_inline_query_current_chat: Option<String>,
+    pub callback_game: Option<CallbackGame>,
+    pub pay: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
