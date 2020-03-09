@@ -76,6 +76,7 @@ pub enum UpdateMessage {
     Unknown,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all(serialize = "lowercase", deserialize = "lowercase"))]
 pub enum ChatType {
@@ -85,6 +86,7 @@ pub enum ChatType {
     Channel,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Chat {
     /// Unique identifier for this chat.
@@ -116,6 +118,7 @@ pub struct Chat {
     pub can_set_sticker_set: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Message {
     pub message_id: i32,
@@ -166,6 +169,7 @@ pub struct Message {
     pub passport_data: Option<PassportData>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MessageEntity {
     #[serde(rename = "type")]
@@ -175,6 +179,8 @@ pub struct MessageEntity {
     pub url: Option<String>,
     pub user: Option<User>,
 }
+
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InlineQuery {
     pub id: String,
@@ -184,6 +190,7 @@ pub struct InlineQuery {
     pub offset: String,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PhotoSize {
     pub file_id: String,
@@ -192,6 +199,7 @@ pub struct PhotoSize {
     pub file_size: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Audio {
     pub file_id: String,
@@ -203,6 +211,7 @@ pub struct Audio {
     pub thumb: Option<PhotoSize>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Document {
     pub file_id: String,
@@ -212,6 +221,7 @@ pub struct Document {
     pub file_size: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Video {
     pub file_id: String,
@@ -223,6 +233,7 @@ pub struct Video {
     pub file_size: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Animation {
     pub file_id: String,
@@ -266,6 +277,7 @@ pub struct PreCheckoutQuery {
     pub order_info: Option<OrderInfo>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Voice {
     file_id: String,
@@ -274,6 +286,7 @@ pub struct Voice {
     file_size: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct VideoNote {
     file_id: String,
@@ -283,6 +296,7 @@ pub struct VideoNote {
     file_size: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Contact {
     phone_number: String,
@@ -292,12 +306,14 @@ pub struct Contact {
     vcard: Option<String>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Location {
     longitude: f64,
     latitude: f64,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Venue {
     location: Location,
@@ -307,12 +323,14 @@ pub struct Venue {
     foursquare_type: Option<String>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PollOption {
     text: String,
     voter_count: i32,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Poll {
     id: String,
@@ -321,12 +339,14 @@ pub struct Poll {
     is_closed: bool,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserProfilePhotos {
     total_count: i32,
     photo: Vec<Vec<PhotoSize>>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct File {
     file_id: String,
@@ -335,6 +355,7 @@ pub struct File {
     file_path: Option<String>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ReplyKeyboardMarkup {
     keyboard: Vec<Vec<KeyboardButton>>,
@@ -343,6 +364,7 @@ pub struct ReplyKeyboardMarkup {
     selective: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct KeyboardButton {
     text: String,
@@ -350,6 +372,7 @@ pub struct KeyboardButton {
     request_location: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ReplyKeyboardRemove {
     /// should be true
@@ -357,11 +380,13 @@ pub struct ReplyKeyboardRemove {
     selective: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InlineKeyboardMarkup {
-    inline_keyboard: Vec<Vec<InlineKeyboardButton>>,
+    pub inline_keyboard: Vec<Vec<InlineKeyboardButton>>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InlineKeyboardButton {
     pub text: String,
@@ -373,6 +398,7 @@ pub struct InlineKeyboardButton {
     pub pay: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CallbackQuery {
     id: String,
@@ -384,6 +410,7 @@ pub struct CallbackQuery {
     game_short_name: Option<String>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ForceReply {
     /// should be true
@@ -391,11 +418,14 @@ pub struct ForceReply {
     selective: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ChatPhoto {
     small_file_id: String,
     big_file_id: String,
 }
+
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ChatMemberStatus {
     Creator,
@@ -406,6 +436,7 @@ pub enum ChatMemberStatus {
     Kicked,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ChatMember {
     user: User,
@@ -427,6 +458,7 @@ pub struct ChatMember {
     can_add_web_page_previews: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ResponseParameters {
     migrate_to_chat_id: Option<i32>,
@@ -577,8 +609,9 @@ pub struct PassportData;
 
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(untagged)]
 pub enum ReplyMarkup {
-    InlineKeyboardMarkup(Vec<Vec<InlineKeyboardButton>>),
+    InlineKeyboardMarkup(InlineKeyboardMarkup),
     ReplyKeyboardMarkup(ReplyKeyboardMarkup),
     ReplyKeyboardRemove(ReplyKeyboardRemove),
     ForceReply(ForceReply),

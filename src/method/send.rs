@@ -223,3 +223,30 @@ pub struct SendPoll {
 pub struct SendChatAction {
 // todo
 }
+
+
+#[cfg(test)]
+mod test {
+    use crate::method::send::SendMessage;
+    use crate::typing::{ReplyMarkup, InlineKeyboardMarkup, InlineKeyboardButton};
+
+    #[test]
+    fn test_serde_send_message_reply_markup() {
+        let mut message = SendMessage::new("@channel", "hello content");
+        let mut vec1 = vec![];
+        vec1.push(InlineKeyboardButton {
+            text: "name".to_string(),
+            url: Some(String::from("https://foo.bar.com")),
+            callback_data: None,
+            switch_inline_query: None,
+            switch_inline_query_current_chat: None,
+            callback_game: None,
+            pay: None
+        });
+        let markup = InlineKeyboardMarkup { inline_keyboard: vec![vec1] };
+        message.reply_markup = Some(ReplyMarkup::InlineKeyboardMarkup(markup));
+
+        let result = serde_json::to_string(&message).unwrap();
+        assert_eq!(result, r#"{"chat_id":"@channel","text":"hello content","reply_markup":{"inline_keyboard":[[{"text":"name","url":"https://foo.bar.com"}]]}}"#);
+    }
+}
