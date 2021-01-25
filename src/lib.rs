@@ -15,3 +15,20 @@ pub trait TelegramApiMethod: serde::Serialize {
         Self::METHOD
     }
 }
+
+
+
+#[cfg(test)]
+mod test {
+    use crate::bot::Bot;
+
+    #[tokio::test]
+    async fn test_all() {
+        let mut bot = Bot::new();
+        bot.command("HELP", |bot, msg| async {
+            dbg!(msg);
+            println!("hello");
+        });
+        bot.run().await;
+    }
+}

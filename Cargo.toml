@@ -7,12 +7,12 @@ description = "yet another async telegram bot framework"
 license = "MIT"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_with = "1.4.0"
-surf = "1.0"
-tokio = { version = "0.2.11", features = ["macros","rt-core","rt-threaded"] }
+serde = { version = "1.0.119", features = ["derive"] }
+serde_with = "1.6.0"
+surf = "2.1.0"
+tokio = { version = "1.0.2", features = ["macros","rt-multi-thread", "time"] }
 [features]
 default = []
 
 [dev-dependencies]
-serde_json = "1.0"
+serde_json = "1.0.61"

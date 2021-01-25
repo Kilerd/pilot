@@ -5,6 +5,9 @@ use std::sync::Arc;
 use crate::error::{ApiResult, BotResult};
 use crate::TelegramApiMethod;
 use crate::typing::Update;
+use crate::method::webhook::GetUpdates;
+use tokio::time::Duration;
+use std::convert::TryInto;
 
 pub struct Bot {
     pub secret_key: String,
@@ -22,8 +25,8 @@ impl Bot {
 
     pub async fn request<T: TelegramApiMethod>(&self, method: T) -> BotResult<T::Response> {
         let result = surf::post(format!("https://api.telegram.org/bot{}/{}", self.secret_key, method.get_method()))
-            .body_json(&method)
-            .unwrap().await;
+            .body(surf::Body::from_json(&method).unwrap())
+            .await;
         let x = result.unwrap().body_json::<ApiResult<T::Response>>().await;
         x.unwrap().into_result()
     }
@@ -39,12 +42,37 @@ impl Bot {
                 tokio::spawn(handler(bot, update));
             })));
     }
-    pub async fn handle(&self, arc: Arc<Bot>,  update: Update) {
+    pub async fn handle(&self, arc: Arc<Bot>, update: Update) {
         let option = self.commands.get("ping");
         let arc1 = Arc::new(update);
         let x = option.unwrap();
         for handler in x {
             handler(arc.clone(), arc1.clone())
+        }
+    }
+
+    pub async fn run(self) {
+
+        let arc_self = Arc::new(self);
+
+        let mut interval1 = tokio::time::interval(Duration::from_millis(100));
+        loop {
+            interval1.tick().await;
+            let result = arc_self.request(GetUpdates {
+                offset: None,
+                limit: None,
+                timeout: None,
+                allowed_updates: None
+            }).await.unwrap();
+            for one_msg in result {
+                let msg = Arc::new(one_msg);
+                let option = arc_self.commands.get("HELP");
+                if let Some(handlers) = option {
+                    for one_handler in handlers {
+                        one_handler(arc_self.clone(), msg.clone());
+                    }
+                }
+            }
         }
     }
 }
