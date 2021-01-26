@@ -173,12 +173,32 @@ pub struct Message {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MessageEntity {
     #[serde(rename = "type")]
-    pub message_type: String,
+    pub message_type: MessageEntityType,
     pub offset: i32,
     pub length: i32,
     pub url: Option<String>,
     pub user: Option<User>,
 }
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(rename_all="snake_case")]
+pub enum MessageEntityType {
+    Mention,
+    Hashtag,
+    Cashtag,
+    BotCommand,
+    Url,
+    Email,
+    PhoneNumber,
+    Bold,
+    Italic,
+    Underline,
+    Strikethough,
+    Code,
+    Pre,
+    TextLink,
+    TextMention,
+}
+
 
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Clone)]

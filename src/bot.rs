@@ -4,14 +4,14 @@ use std::sync::Arc;
 
 use crate::error::{ApiResult, BotResult};
 use crate::method::webhook::GetUpdates;
-use crate::typing::Update;
+use crate::typing::{Update, UpdateMessage};
 use crate::TelegramApiMethod;
 use std::convert::TryInto;
 use tokio::time::Duration;
 
 pub struct Bot {
-    pub secret_key: String,
-    pub commands: HashMap<String, Vec<Box<Arc<dyn Fn(Arc<Bot>, Arc<Update>) + Send + Sync>>>>,
+    secret_key: String,
+    commands: HashMap<String, Vec<Box<Arc<dyn Fn(Arc<Bot>, Arc<UpdateMessage>) + Send + Sync>>>>,
 }
 
 impl Bot {
@@ -37,35 +37,27 @@ impl Bot {
 
     pub fn command<H, F>(&mut self, command: &str, handler: H)
     where
-        H: (Fn(Arc<Bot>, Arc<Update>) -> F) + Send + Sync + 'static,
+        H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
         F: std::future::Future<Output = ()> + Send + 'static,
     {
         self.commands
-            .entry(command.to_string())
+            .entry(command.to_uppercase())
             .or_insert(Vec::new())
             .push(Box::new(Arc::new(move |bot, update| {
                 tokio::spawn(handler(bot, update));
             })));
     }
-    pub async fn handle(&self, arc: Arc<Bot>, update: Update) {
-        let option = self.commands.get("ping");
-        let arc1 = Arc::new(update);
-        let x = option.unwrap();
-        for handler in x {
-            handler(arc.clone(), arc1.clone())
-        }
-    }
 
-    pub async fn run(self) {
+    pub async fn polling(self) {
         let arc_self = Arc::new(self);
 
-        let mut interval1 = tokio::time::interval(Duration::from_millis(100));
+        let mut interval = tokio::time::interval(Duration::from_millis(100));
+        let mut offset = 0;
         loop {
-            interval1.tick().await;
-            let mut offset = 0;
+            interval.tick().await;
             let result = arc_self
                 .request(GetUpdates {
-                    offset: if offset == 0 { None } else { Some(offset) },
+                    offset: if offset == 0 { None } else { Some(offset + 1) },
                     limit: None,
                     timeout: Some(10),
                     allowed_updates: None,
@@ -74,46 +66,34 @@ impl Bot {
                 .unwrap();
             for one_msg in result {
                 offset = one_msg.update_id;
-                let msg = Arc::new(one_msg);
-                let option = arc_self.commands.get("HELP");
-                if let Some(handlers) = option {
-                    for one_handler in handlers {
-                        one_handler(arc_self.clone(), msg.clone());
+                let option1 = match &one_msg.message {
+                    UpdateMessage::Message(msg) | UpdateMessage::EditedMessage(msg) => {
+                        msg.text.as_ref()
+                    }
+                    _ => None,
+                };
+                let option2 = option1
+                    .and_then(|text| {
+                        if text.starts_with('/') {
+                            let n: Vec<&str> = text.splitn(2, ' ').collect();
+                            let command = &n[0][1..n[0].len()];
+                            Some(command)
+                        } else {
+                            None
+                        }
+                    })
+                    .map(|command| command.to_uppercase());
+
+                if let Some(command) = option2 {
+                    let msg = Arc::new(one_msg.message);
+                    let option = arc_self.commands.get(&command);
+                    if let Some(handlers) = option {
+                        for one_handler in handlers {
+                            one_handler(arc_self.clone(), msg.clone());
+                        }
                     }
                 }
             }
         }
     }
-}
-
-#[cfg(test)]
-mod test {
-    use crate::bot::Bot;
-    use crate::method::GetMe;
-    use crate::typing::{Update, UpdateMessage};
-    use std::sync::Arc;
-    //
-    //    #[tokio::test]
-    //    async fn test_binding_server() {
-    //        let bot = Bot::new();
-    //        let result = bot.request(GetMe {}).await;
-    //        dbg!(result);
-    //    }
-    //
-    //    #[tokio::test]
-    //    async fn handle_a_new_command() {
-    //        let mut bot = Bot::new();
-    //        let x = |bbot:Arc<Bot>, update:Arc<Update>| {
-    //            async move {
-    //                println!("pong");
-    //                let result = bbot.request(GetMe {}).await;
-    //                dbg!(result);
-    //            }
-    //        };
-    //        bot.command("ping", x);
-    //        let update1 = Update { update_id: 0, message: UpdateMessage::Unknown };
-    //        let arc = Arc::new(bot);
-    //
-    //        bot.handle(arc, update1).await;
-    //    }
 }
