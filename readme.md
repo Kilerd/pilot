@@ -1,4 +1,6 @@
-# Telegram Typing Bot
+# Pilot
+the pilot manipulating telegram bot
+
 this project is highly WIP, and the name would also be renamed in the later release, please be really deep considering when trying it. 
 
 ## Get started

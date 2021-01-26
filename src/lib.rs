@@ -14,25 +14,3 @@ pub trait TelegramApiMethod: serde::Serialize {
         Self::METHOD
     }
 }
-
-#[cfg(test)]
-mod test {
-    use crate::bot::Bot;
-    use crate::method::send::SendMessage;
-    use crate::typing::UpdateMessage;
-
-    #[tokio::test]
-    async fn test_all() {
-        let mut bot = Bot::new();
-        bot.command("ping", |bot, msg| async move {
-            match msg.as_ref() {
-                UpdateMessage::Message(msg) => {
-                    let message = SendMessage::new(msg.chat.id.to_string(), "pong");
-                    bot.request(message).await;
-                }
-                _ => {}
-            }
-        });
-        bot.polling().await;
-    }
-}
