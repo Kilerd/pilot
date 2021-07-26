@@ -6,7 +6,7 @@ this project is highly WIP, and the name would also be renamed in the later rele
 ## Get started
 
 ```rust
-use telegram_typing_bot::{Bot, UpdateMessage, SendMessage};
+use pilot::{Bot, UpdateMessage, SendMessage};
 async fn main() {
     let mut bot = Bot::new();
     bot.command("ping", |bot, msg| async move {
