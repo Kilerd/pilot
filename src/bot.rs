@@ -12,6 +12,7 @@ use tokio::time::Duration;
 pub struct Bot {
     secret_key: String,
     commands: HashMap<String, Vec<Box<Arc<dyn Fn(Arc<Bot>, Arc<UpdateMessage>) + Send + Sync>>>>,
+    other: Option<Box<Arc<dyn Fn(Arc<Bot>, Arc<UpdateMessage>) + Send + Sync>>>,
 }
 
 impl Bot {
@@ -20,6 +21,7 @@ impl Bot {
             secret_key: std::env::var("TELEGRAM_BOT_SECRET_KEY")
                 .expect("need to set TELEGRAM_BOT_SECRET_KEY as environment variable"),
             commands: Default::default(),
+            other: None,
         }
     }
 
@@ -29,16 +31,16 @@ impl Bot {
             self.secret_key,
             method.get_method()
         ))
-        .body(surf::Body::from_json(&method).unwrap())
-        .await;
+            .body(surf::Body::from_json(&method).unwrap())
+            .await;
         let x = result.unwrap().body_json::<ApiResult<T::Response>>().await;
         x.unwrap().into_result()
     }
 
     pub fn command<H, F>(&mut self, command: &str, handler: H)
-    where
-        H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
-        F: std::future::Future<Output = ()> + Send + 'static,
+        where
+            H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
+            F: std::future::Future<Output=()> + Send + 'static,
     {
         self.commands
             .entry(command.to_uppercase())
@@ -46,6 +48,15 @@ impl Bot {
             .push(Box::new(Arc::new(move |bot, update| {
                 tokio::spawn(handler(bot, update));
             })));
+    }
+    pub fn other<H, F>(&mut self, handler: H)
+        where
+            H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
+            F: std::future::Future<Output=()> + Send + 'static,
+    {
+        self.other = Some(Box::new(Arc::new(move |bot, update| {
+            tokio::spawn(handler(bot, update));
+        })));
     }
 
     pub async fn polling(self) {
@@ -84,13 +95,18 @@ impl Bot {
                     })
                     .map(|command| command.to_uppercase());
 
+                let msg = Arc::new(one_msg.message);
+
                 if let Some(command) = option2 {
-                    let msg = Arc::new(one_msg.message);
                     let option = arc_self.commands.get(&command);
                     if let Some(handlers) = option {
                         for one_handler in handlers {
                             one_handler(arc_self.clone(), msg.clone());
                         }
+                    }
+                } else {
+                    if let Some(other_handler) = arc_self.other.as_ref() {
+                        other_handler(arc_self.clone(), msg.clone());
                     }
                 }
             }

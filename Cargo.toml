@@ -1,6 +1,6 @@
 [package]
 name = "pilot"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Kilerd <blove694@gmail.com>"]
 edition = "2018"
 description = "the pilot manipulating telegram bot"
@@ -8,13 +8,13 @@ readme = "readme.md"
 license = "MIT"
 
 [dependencies]
-serde = { version = "1.0.119", features = ["derive"] }
-serde_with = "1.6.0"
-surf = "2.1.0"
-tokio = { version = "1.0.2", features = ["macros","rt-multi-thread", "time"] }
+serde = { version = "1", features = ["derive"] }
+serde_with = "1.9"
+surf = "2.2"
+tokio = { version = "1.9", features = ["macros","rt-multi-thread", "time"] }
 
 [features]
 default = []
 
 [dev-dependencies]
-serde_json = "1.0.61"
+serde_json = "1.0.64"
