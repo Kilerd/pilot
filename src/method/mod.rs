@@ -9,12 +9,13 @@ pub mod webhook;
 pub mod send;
 pub mod info;
 pub mod inline;
+pub mod updating;
 
-use webhook::*;
-use send::*;
-
-use info::*;
-use inline::*;
+pub use webhook::*;
+pub use send::*;
+pub use info::*;
+pub use inline::*;
+pub use updating::*;
 
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -63,7 +64,9 @@ impl_api_method!(
 
 
     GetUserProfilePhotos:       "GetUserProfilePhotos" ->       UserProfilePhotos,
-    GetFile:                    "GetFile" ->                    File
+    GetFile:                    "GetFile" ->                    File,
+
+    DeleteMessage<'_>:              "deleteMessage" ->              bool
 );
 
 
