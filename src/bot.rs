@@ -11,8 +11,8 @@ use tokio::time::Duration;
 
 pub struct Bot {
     secret_key: String,
-    commands: HashMap<String, Vec<Box<Arc<dyn Fn(Arc<Bot>, Arc<UpdateMessage>) + Send + Sync>>>>,
-    other: Option<Box<Arc<dyn Fn(Arc<Bot>, Arc<UpdateMessage>) + Send + Sync>>>,
+    commands: HashMap<String, Vec<Box<dyn Fn(Arc<Bot>, Arc<UpdateMessage>) + Send + Sync>>>,
+    other: Option<Box<dyn Fn(Arc<Bot>, Arc<UpdateMessage>) + Send + Sync>>,
 }
 
 impl Bot {
@@ -45,18 +45,18 @@ impl Bot {
         self.commands
             .entry(command.to_uppercase())
             .or_insert(Vec::new())
-            .push(Box::new(Arc::new(move |bot, update| {
+            .push(Box::new(move |bot, update| {
                 tokio::spawn(handler(bot, update));
-            })));
+            }));
     }
     pub fn other<H, F>(&mut self, handler: H)
         where
             H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
             F: std::future::Future<Output=()> + Send + 'static,
     {
-        self.other = Some(Box::new(Arc::new(move |bot, update| {
+        self.other = Some(Box::new(move |bot, update| {
             tokio::spawn(handler(bot, update));
-        })));
+        }));
     }
 
     pub async fn polling(self) {
