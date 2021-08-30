@@ -77,7 +77,7 @@ impl Bot {
                 .await;
             match result {
                 Ok(updates) => {
-                    for one_msg in result {
+                    for one_msg in updates {
                         offset = one_msg.update_id;
                         let option1 = match &one_msg.message {
                             UpdateMessage::Message(msg) | UpdateMessage::EditedMessage(msg) => {
