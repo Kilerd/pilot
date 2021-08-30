@@ -8,6 +8,7 @@ readme = "readme.md"
 license = "MIT"
 
 [dependencies]
+log = "0.4.14"
 serde = { version = "1", features = ["derive"] }
 serde_with = "1.9"
 surf = "2.2"

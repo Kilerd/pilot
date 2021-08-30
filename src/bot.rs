@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::future::Future;
 use std::sync::Arc;
 
-use crate::error::{ApiResult, BotResult};
+use crate::error::{ApiResult, BotResult, ApiError};
 use crate::method::webhook::GetUpdates;
 use crate::typing::{Update, UpdateMessage};
 use crate::TelegramApiMethod;
@@ -66,6 +66,7 @@ impl Bot {
         let mut offset = 0;
         loop {
             interval.tick().await;
+            debug!("requesting updates with offset: {}", &offset);
             let result = arc_self
                 .request(GetUpdates {
                     offset: if offset == 0 { None } else { Some(offset + 1) },
@@ -73,43 +74,52 @@ impl Bot {
                     timeout: Some(10),
                     allowed_updates: None,
                 })
-                .await
-                .unwrap();
-            for one_msg in result {
-                offset = one_msg.update_id;
-                let option1 = match &one_msg.message {
-                    UpdateMessage::Message(msg) | UpdateMessage::EditedMessage(msg) => {
-                        msg.text.as_ref()
-                    }
-                    _ => None,
-                };
-                let option2 = option1
-                    .and_then(|text| {
-                        if text.starts_with('/') {
-                            let n: Vec<&str> = text.splitn(2, ' ').collect();
-                            let command = &n[0][1..n[0].len()];
-                            Some(command)
+                .await;
+            match result {
+                Ok(updates) => {
+                    for one_msg in result {
+                        offset = one_msg.update_id;
+                        let option1 = match &one_msg.message {
+                            UpdateMessage::Message(msg) | UpdateMessage::EditedMessage(msg) => {
+                                msg.text.as_ref()
+                            }
+                            _ => None,
+                        };
+                        let option2 = option1
+                            .and_then(|text| {
+                                if text.starts_with('/') {
+                                    let n: Vec<&str> = text.splitn(2, ' ').collect();
+                                    let command = &n[0][1..n[0].len()];
+                                    Some(command)
+                                } else {
+                                    None
+                                }
+                            })
+                            .map(|command| command.to_uppercase());
+
+                        let msg = Arc::new(one_msg.message);
+
+                        if let Some(command) = option2 {
+                            debug!("match command {}", &command);
+                            let option = arc_self.commands.get(&command);
+                            if let Some(handlers) = option {
+                                for one_handler in handlers {
+                                    one_handler(arc_self.clone(), msg.clone());
+                                }
+                            }
                         } else {
-                            None
+                            debug!("command does not match, dispatch it to other handlers.");
+                            if let Some(other_handler) = arc_self.other.as_ref() {
+                                other_handler(arc_self.clone(), msg.clone());
+                            }
                         }
-                    })
-                    .map(|command| command.to_uppercase());
-
-                let msg = Arc::new(one_msg.message);
-
-                if let Some(command) = option2 {
-                    let option = arc_self.commands.get(&command);
-                    if let Some(handlers) = option {
-                        for one_handler in handlers {
-                            one_handler(arc_self.clone(), msg.clone());
-                        }
-                    }
-                } else {
-                    if let Some(other_handler) = arc_self.other.as_ref() {
-                        other_handler(arc_self.clone(), msg.clone());
                     }
                 }
+                Err(e) => {
+                    warn!("fail on fetching telegram updates: {:?}", e)
+                }
             }
+
         }
     }
 }

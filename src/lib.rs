@@ -1,3 +1,5 @@
+#[macro_use] extern crate log;
+
 use crate::bot::Bot;
 use crate::error::ApiResult;
 
