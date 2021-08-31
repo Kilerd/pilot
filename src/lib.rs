@@ -1,12 +1,15 @@
 #[macro_use] extern crate log;
 
-use crate::bot::Bot;
-use crate::error::ApiResult;
+
 
 pub mod bot;
 pub mod error;
 pub mod method;
 pub mod typing;
+
+
+pub use crate::bot::Bot;
+pub use crate::error::PilotError;
 
 pub trait TelegramApiMethod: serde::Serialize {
     const METHOD: &'static str;

@@ -1,12 +1,10 @@
 use std::collections::HashMap;
-use std::future::Future;
 use std::sync::Arc;
 
-use crate::error::{ApiResult, BotResult, ApiError};
+use crate::error::{ApiResult, BotResult, PilotError};
 use crate::method::webhook::GetUpdates;
-use crate::typing::{Update, UpdateMessage};
+use crate::typing::{UpdateMessage};
 use crate::TelegramApiMethod;
-use std::convert::TryInto;
 use tokio::time::Duration;
 
 pub struct Bot {
@@ -25,22 +23,31 @@ impl Bot {
         }
     }
 
-    pub async fn request<T: TelegramApiMethod>(&self, method: T) -> BotResult<T::Response> {
-        let result = surf::post(format!(
+    pub async fn request<T: TelegramApiMethod>(
+        &self,
+        method: T,
+    ) -> Result<BotResult<T::Response>, PilotError> {
+        let uri = format!(
             "https://api.telegram.org/bot{}/{}",
             self.secret_key,
             method.get_method()
-        ))
-            .body(surf::Body::from_json(&method).unwrap())
-            .await;
-        let x = result.unwrap().body_json::<ApiResult<T::Response>>().await;
-        x.unwrap().into_result()
+        );
+        let client = reqwest::Client::new();
+        let bot_result = client
+            .post(uri)
+            .json(&method)
+            .send()
+            .await?
+            .json::<ApiResult<T::Response>>()
+            .await?
+            .into_result();
+        Ok(bot_result)
     }
 
     pub fn command<H, F>(&mut self, command: &str, handler: H)
-        where
-            H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
-            F: std::future::Future<Output=()> + Send + 'static,
+    where
+        H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
+        F: std::future::Future<Output = ()> + Send + 'static,
     {
         self.commands
             .entry(command.to_uppercase())
@@ -50,9 +57,9 @@ impl Bot {
             }));
     }
     pub fn other<H, F>(&mut self, handler: H)
-        where
-            H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
-            F: std::future::Future<Output=()> + Send + 'static,
+    where
+        H: (Fn(Arc<Bot>, Arc<UpdateMessage>) -> F) + Send + Sync + 'static,
+        F: std::future::Future<Output = ()> + Send + 'static,
     {
         self.other = Some(Box::new(move |bot, update| {
             tokio::spawn(handler(bot, update));
@@ -75,7 +82,14 @@ impl Bot {
                     allowed_updates: None,
                 })
                 .await;
-            match result {
+            let bot_result = match result {
+                Ok(br) => br,
+                Err(e) => {
+                    warn!("fail on polling: {}", e);
+                    continue;
+                }
+            };
+            match bot_result {
                 Ok(updates) => {
                     for one_msg in updates {
                         offset = one_msg.update_id;
@@ -119,7 +133,6 @@ impl Bot {
                     warn!("fail on fetching telegram updates: {:?}", e)
                 }
             }
-
         }
     }
 }
