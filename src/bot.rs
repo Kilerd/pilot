@@ -78,7 +78,7 @@ impl Bot {
                 .request(GetUpdates {
                     offset: if offset == 0 { None } else { Some(offset + 1) },
                     limit: None,
-                    timeout: Some(10),
+                    timeout: Some(30),
                     allowed_updates: None,
                 })
                 .await;
