@@ -36,6 +36,7 @@ impl Bot {
         let bot_result = client
             .post(uri)
             .json(&method)
+            .timeout(Duration::from_secs(32))
             .send()
             .await?
             .json::<ApiResult<T::Response>>()
@@ -69,10 +70,8 @@ impl Bot {
     pub async fn polling(self) {
         let arc_self = Arc::new(self);
 
-        let mut interval = tokio::time::interval(Duration::from_millis(100));
         let mut offset = 0;
         loop {
-            interval.tick().await;
             debug!("requesting updates with offset: {}", &offset);
             let result = arc_self
                 .request(GetUpdates {
