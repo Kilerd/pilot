@@ -36,7 +36,7 @@ impl Bot {
         let bot_result = client
             .post(uri)
             .json(&method)
-            .timeout(Duration::from_secs(32))
+            .timeout(Duration::from_secs(30))
             .send()
             .await?
             .json::<ApiResult<T::Response>>()
